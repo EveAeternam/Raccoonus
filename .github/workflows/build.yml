@@ -1,0 +1,32 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore FaviconSnatcher.slnx
+
+      - name: Build
+        run: dotnet build FaviconSnatcher.slnx --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish FaviconSnatcher/FaviconSnatcher.csproj --configuration Release --no-build --output publish
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: FaviconSnatcher
+          path: publish/
